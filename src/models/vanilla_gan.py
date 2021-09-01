@@ -28,7 +28,7 @@ def train_step(data, vars_g, vars_d, optim_g, optim_d, rng):
 
 @jax.jit
 def eval_step(params, vars, latent, generator):  
-  fake_data, _ = generator(training=False).apply(
+  fake_data, _ = generator.apply(
       {'params': params, 'batch_stats': vars['batch_stats']},
       latent, mutable=['batch_stats']
   )

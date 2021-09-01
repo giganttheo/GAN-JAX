@@ -38,7 +38,7 @@ def main():
             loss['generator'].append(batch_loss['generator'])
             loss['discriminator'].append(batch_loss['discriminator'])
     
-    sample = eval_step(optim_g.target, vars_g, latent, generator=Generator(train=False))
+    sample = eval_step(optim_g.target, vars_g, latent, generator=Generator(training=False))
     plot(sample, loss, epoch)
 
 if __name__ == "main":
