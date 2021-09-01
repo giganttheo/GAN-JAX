@@ -28,15 +28,15 @@ def main():
     loss = {'generator': [], 'discriminator': []}
 
     for epoch in range(1, 51):
-    for batch in range(batches_in_epoch):
-        data = next(data_gen)
+        for batch in range(batches_in_epoch):
+            data = next(data_gen)
 
-        batch_loss, vars_g, vars_d, optim_g, optim_d, key = train_step(
-            data, vars_g, vars_d, optim_g, optim_d, key
-        )
+            batch_loss, vars_g, vars_d, optim_g, optim_d, key = train_step(
+                data, vars_g, vars_d, optim_g, optim_d, key
+            )
 
-        loss['generator'].append(batch_loss['generator'])
-        loss['discriminator'].append(batch_loss['discriminator'])
+            loss['generator'].append(batch_loss['generator'])
+            loss['discriminator'].append(batch_loss['discriminator'])
     
     sample = eval_step(optim_g.target, vars_g, latent)
     plot(sample, loss, epoch)
