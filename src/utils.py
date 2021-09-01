@@ -8,8 +8,8 @@ def plot(images, loss, epoch):
 
   # First plot the losses.
   fig, ax = plt.subplots(figsize=(10, 4))
-  ax.plot(loss['generator'], label='Generator Loss')
-  ax.plot(loss['discriminator'], label='Discriminator Loss')
+  for key in loss.keys():
+      ax.plot(loss[key], label=f'{key} loss')
   ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
   fig.suptitle(f"Epoch {epoch}")
 
