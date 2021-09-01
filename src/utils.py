@@ -21,5 +21,31 @@ def plot(images, loss, epoch):
 
   plt.show()
 
+
+def plot_conditional(images, loss, labels, epoch):
+  clear_output(True)
+
+  # First plot the losses.
+  fig, ax = plt.subplots(figsize=(10, 4))
+  for key in loss.keys():
+      ax.plot(loss[key], label=f'{key} loss')
+  ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+  fig.suptitle(f"Epoch {epoch}")
+
+
+  fig, axes = plt.subplots(nrows=10, ncols=10, figsize=(10, 10), tight_layout=True)
+  for ax, image, label in zip(sum(axes.tolist(), []), images, labels):
+    ax.imshow(image[:, :, 0], cmap='gray')
+    ax.set_axis_off()
+    ax.text(0, 0, f"{label}", bbox=dict(facecolor='white'))
+
+  plt.show()
+
 def sample_latent(key, shape):
   return jax.random.normal(key, shape=shape)
+
+@jax.jit
+def fetch_oh_labels(labels, num_classes=10):
+  oh_labels = jax.nn.one_hot(labels, num_classes=num_classes)
+  oh_labels_img = oh_labels[:, None, None, :].repeat(28, 1).repeat(28, 2)
+  return oh_labels, oh_labels_img

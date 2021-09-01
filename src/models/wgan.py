@@ -2,7 +2,7 @@ import jax
 import jax.numpy as jnp
 from flax import linen as nn
 from utils import sample_latent
-from architecture.DCGAN import Generator, Critic
+from architecture.dcgan import Generator, Critic
 
 #Losses
 
