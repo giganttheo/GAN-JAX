@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import jax
+from IPython.display import clear_output
+
 
 def plot(images, loss, epoch):
   clear_output(True)
