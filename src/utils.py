@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import jax
 
 def plot(images, loss, epoch):
   clear_output(True)
@@ -17,3 +18,6 @@ def plot(images, loss, epoch):
     ax.set_axis_off()
 
   plt.show()
+
+def sample_latent(key, shape):
+  return jax.random.normal(key, shape=shape)

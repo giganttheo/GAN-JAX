@@ -4,9 +4,6 @@ import jax
 from losses import loss_generator, loss_discriminator
 from architecture.conv_net import Generator
 
-def sample_latent(key, shape):
-  return jax.random.normal(key, shape=shape)
-
 @jax.jit
 def train_step(data, vars_g, vars_d, optim_g, optim_d, rng):
   key, key_gen, key_disc = jax.random.split(rng, 3)

@@ -1,10 +1,10 @@
 import jax
 import flax
 import jax.numpy as jnp
-from models.vanilla_gan import sample_latent, train_step, eval_step
+from models.vanilla_gan import train_step, eval_step
 from architecture.conv_net import Generator, Discriminator
 from data.mnist import get_data
-from utils import plot
+from utils import plot, sample_latent
 
 
 def main():

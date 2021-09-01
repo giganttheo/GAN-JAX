@@ -1,5 +1,5 @@
 import jax.numpy as jnp
-from models.vanilla_gan import sample_latent
+from utils import sample_latent
 from architecture.conv_net import Generator, Discriminator
 
 def bce_logits(input, target):
