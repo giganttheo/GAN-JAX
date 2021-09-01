@@ -1,4 +1,5 @@
 import jax.numpy as jnp
+from flax import linen as nn
 from utils import sample_latent
 from architecture.conv_net import Generator, Discriminator
 
