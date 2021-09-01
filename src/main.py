@@ -2,7 +2,7 @@ import jax
 import flax
 import jax.numpy as jnp
 from models.vanilla_gan import train_step, eval_step
-from architecture.conv_net import Generator, Discriminator
+from architecture.DCGAN import Generator, Discriminator
 from data.mnist import get_data
 from utils import plot, sample_latent
 
@@ -38,7 +38,7 @@ def main():
             loss['generator'].append(batch_loss['generator'])
             loss['discriminator'].append(batch_loss['discriminator'])
     
-    sample = eval_step(optim_g.target, vars_g, latent)
+    sample = eval_step(optim_g.target, vars_g, latent, Generator=Generator)
     plot(sample, loss, epoch)
 
 if __name__ == "main":

@@ -2,7 +2,7 @@ import jax
 #TODO import
 
 from losses import loss_generator, loss_discriminator
-from architecture.conv_net import Generator
+#from architecture.DCGAN import Generator
 
 @jax.jit
 def train_step(data, vars_g, vars_d, optim_g, optim_d, rng):
@@ -29,7 +29,7 @@ def train_step(data, vars_g, vars_d, optim_g, optim_d, rng):
 
 
 @jax.jit
-def eval_step(params, vars, latent):  
+def eval_step(params, vars, latent, Generator):  
   fake_data, _ = Generator(training=False).apply(
       {'params': params, 'batch_stats': vars['batch_stats']},
       latent, mutable=['batch_stats']

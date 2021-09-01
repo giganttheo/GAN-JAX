@@ -1,7 +1,7 @@
 import jax.numpy as jnp
 from flax import linen as nn
 from utils import sample_latent
-from architecture.conv_net import Generator, Discriminator
+from architecture.DCGAN import Generator, Discriminator
 
 def bce_logits(input, target):
   """
