@@ -1,5 +1,6 @@
 from flax import linen as nn
 from jax.nn.initializers import normal as normal_init
+import jax.numpy as jnp
 
 class Generator(nn.Module):
   features: int = 64
