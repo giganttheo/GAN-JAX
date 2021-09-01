@@ -41,4 +41,4 @@ def get_data():
             .repeat()
             .batch(128)
     ))
-    return data_gen
+    return data_gen, batches_in_epoch
