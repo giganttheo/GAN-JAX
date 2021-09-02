@@ -44,6 +44,20 @@ def plot_conditional(images, loss, labels, epoch):
 def sample_latent(key, shape):
   return jax.random.normal(key, shape=shape)
 
+def sample_latent_categorical(key, shape_noise, shape_cat):
+  noise_key, cat_key = jax.random.split(key, 2)
+  
+  # Sample irreducible noise
+  noise = jax.random.normal(noise_key, shape_noise)
+
+  # Sample categorical latent code
+  code_cat = jax.random.randint(cat_key, shape_cat, 0, 10)
+  code_cat = jax.nn.one_hot(code_cat, 10)
+
+  latent = jnp.concatenate([noise, code_cat], axis=-1)
+
+  return latent, code_cat
+
 @jax.jit
 def fetch_oh_labels(labels, num_classes=10):
   oh_labels = jax.nn.one_hot(labels, num_classes=num_classes)

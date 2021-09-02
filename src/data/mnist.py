@@ -2,7 +2,7 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 
 
-""" #Unconditionnal gans
+#Unconditionnal gans
 def set_range(batch):
   batch = tf.image.convert_image_dtype(batch['image'], tf.float32)
   batch = (batch - 0.5) / 0.5  # tanh range is -1, 1
@@ -42,3 +42,4 @@ def get_data():
             .batch(128)
     ))
     return data_gen, batches_in_epoch
+"""

@@ -53,3 +53,30 @@ class Critic(nn.Module):
     x = nn.Conv(1, [4, 4], [2, 2], 'VALID', kernel_init=normal_init(0.02))(x)
     x = x.reshape((x.shape[0], -1))
     return x
+
+class DiscriminatorAndRecognitionNetwork(nn.Module):
+  features: int = 64
+  training: bool = True
+
+  q_cat: int = 10
+
+  @nn.compact
+  def __call__(self, x):
+    x = nn.Conv(self.features, [4, 4], [2, 2], 'VALID', kernel_init=normal_init(0.02))(x)
+    x = nn.BatchNorm(not self.training, -1, 0.1, scale_init=normal_init(0.02))(x)
+    x = nn.leaky_relu(x, 0.2)
+    x = nn.Conv(self.features*2, [4, 4], [2, 2], 'VALID', kernel_init=normal_init(0.02))(x)
+    x = nn.BatchNorm(not self.training, -1, 0.1, scale_init=normal_init(0.02))(x)
+    x = nn.leaky_relu(x, 0.2)
+    
+    # Discriminator output
+    d = nn.Conv(1, [4, 4], [2, 2], 'VALID', kernel_init=normal_init(0.02))(x)
+    d = d.reshape((d.shape[0], -1))
+
+    # Q outpiut
+    q = nn.Conv(self.features*2, [4, 4], [2, 2], 'VALID', kernel_init=normal_init(0.02))(x)
+    q = nn.BatchNorm(not self.training, -1, 0.1, scale_init=normal_init(0.02))(q)
+    q = nn.leaky_relu(q, 0.2)
+    q = nn.Conv(self.q_cat, [1, 1], [2, 2], 'VALID', kernel_init=normal_init(0.02))(q)
+    q = q.reshape((q.shape[0], -1))
+    return d, q

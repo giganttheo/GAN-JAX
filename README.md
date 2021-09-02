@@ -8,3 +8,15 @@
 
 TODO :
  [] Architecture selection from config (replaces the hardcoded class import)
+
+Methods :
+ [] CycleGAN
+ [] CUT
+ [] StarGAN v1
+ [] StarGAN v2
+
+Architectures :
+ [] Resnet
+ [] Unet
+ [] Visual transformer
+ [] Stylegan
