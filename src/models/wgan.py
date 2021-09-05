@@ -1,5 +1,6 @@
 import jax
 import jax.numpy as jnp
+import flax
 from flax import linen as nn
 from utils import sample_latent
 from architecture.dcgan import Generator, Critic
