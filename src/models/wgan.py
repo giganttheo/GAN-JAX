@@ -114,11 +114,13 @@ def eval_step(params, vars, latent):
 
 #Training loop
 
-class Wgan(Model):
+class WGan(Model):
     def __init__(self):
         pass
 
     def train(self, data_gen, batches_in_epoch, key, verbose=1):
+        epochs = 51
+
         key, key_gen, key_crit, key_latent = jax.random.split(key, 4)
 
         # Retrieve shapes for generator and discriminator input.
@@ -135,7 +137,7 @@ class Wgan(Model):
 
         loss = {'generator': [], 'critic': []}
 
-        for epoch in range(1, 51):
+        for epoch in range(1, epochs):
             for batch in range(batches_in_epoch):
                 data = next(data_gen)
 
