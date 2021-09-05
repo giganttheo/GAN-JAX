@@ -73,7 +73,7 @@ class DiscriminatorAndRecognitionNetwork(nn.Module):
     d = nn.Conv(1, [4, 4], [2, 2], 'VALID', kernel_init=normal_init(0.02))(x)
     d = d.reshape((d.shape[0], -1))
 
-    # Q outpiut
+    # Q output
     q = nn.Conv(self.features*2, [4, 4], [2, 2], 'VALID', kernel_init=normal_init(0.02))(x)
     q = nn.BatchNorm(not self.training, -1, 0.1, scale_init=normal_init(0.02))(q)
     q = nn.leaky_relu(q, 0.2)

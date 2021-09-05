@@ -3,6 +3,8 @@ import jax.numpy as jnp
 from flax import linen as nn
 from utils import sample_latent
 from architecture.dcgan import Generator, Critic
+from utils import plot, sample_latent
+from models.base_model import Model
 
 #Losses
 
@@ -106,3 +108,46 @@ def eval_step(params, vars, latent):
   )
 
   return fake_data
+
+
+
+#Training loop
+
+class Wgan(Model):
+    def __init__(self):
+        pass
+
+    def train(self, data_gen, batches_in_epoch, key, verbose=1):
+        key, key_gen, key_crit, key_latent = jax.random.split(key, 4)
+
+        # Retrieve shapes for generator and discriminator input.
+        latent = sample_latent(key_latent, shape=(100, 64)) #TODO shape
+        image_shape = next(data_gen).shape
+
+        # Generate initial variables (parameters and batch statistics).
+        vars_g = Generator().init(key_gen, jnp.ones(latent.shape, jnp.float32))
+        vars_c = Critic().init(key_crit, jnp.ones(image_shape, jnp.float32))
+
+        # Create optimizers.
+        optim_g = flax.optim.Adam(0.0002, 0.5, 0.999).create(vars_g['params']) #TODO hp
+        optim_c = flax.optim.Adam(0.0002, 0.5, 0.999).create(vars_c['params'])
+
+        loss = {'generator': [], 'critic': []}
+
+        for epoch in range(1, 51):
+            for batch in range(batches_in_epoch):
+                data = next(data_gen)
+
+                batch_loss, vars_g, vars_c, optim_g, optim_c, key = train_step(
+                    data, vars_g, vars_c, optim_g, optim_c, key
+                )
+
+                loss['generator'].append(batch_loss['generator'])
+                loss['critic'].append(batch_loss['critic'])
+        
+            sample = eval_step(optim_g.target, vars_g, latent)
+            if verbose:
+                plot(sample, loss, epoch)
+
+    def eval(self):
+        pass
