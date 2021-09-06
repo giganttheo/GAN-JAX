@@ -3,7 +3,8 @@ import jax.numpy as jnp
 import flax
 from flax import linen as nn
 from utils import sample_latent, plot
-from architecture.resnet import Generator, Discriminator
+from architecture.resnet import ResNet18 as Generator
+from architecture.resnet import Discriminator
 from models.base_model import Model
 
 #Losses
@@ -164,6 +165,7 @@ class CycleGan(Model):
         image_shape = next(data_gen_A).shape
 
         # Generate initial variables (parameters and batch statistics).
+
         vars_g_A = Generator().init(key_gen, jnp.ones(image_shape, jnp.float32))
         vars_g_B = Generator().init(key_gen, jnp.ones(image_shape, jnp.float32))
         vars_d_A = Discriminator().init(key_disc, jnp.ones(image_shape, jnp.float32))

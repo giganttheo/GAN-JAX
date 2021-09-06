@@ -60,10 +60,10 @@ class BottleneckResNetBlock(nn.Module):
     return self.act(residual + y)
 
 
-class Generator(nn.Module):
+class ResNet(nn.Module):
   """ResNetV1."""
-  stage_sizes: Sequence[int] = [2,2,2,2]
-  block_cls: ModuleDef = ResNetBlock
+  stage_sizes: Sequence[int]
+  block_cls: ModuleDef
   num_filters: int = 64
   dtype: Any = jnp.float32
   act: Callable = nn.relu
@@ -110,5 +110,6 @@ class Discriminator(nn.Module):
     x = x.reshape((x.shape[0], -1))
     return x
 
-#ResNet18 = partial(ResNet, stage_sizes=[2, 2, 2, 2],
-#                   block_cls=ResNetBlock)
+
+ResNet18 = partial(ResNet, stage_sizes=[2, 2, 2, 2],
+            block_cls=ResNetBlock)
