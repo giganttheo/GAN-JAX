@@ -59,10 +59,10 @@ def get_data():
         preprocess_image_train, num_parallel_calls=AUTOTUNE).shuffle(
         BUFFER_SIZE).batch(BATCH_SIZE)
 
-    batches_per_epoch = [len(dataset)/BATCH_SIZE for dataset in [train_horses, train_zebras] ]
+    batches_in_epoch = [len(dataset)//BATCH_SIZE for dataset in [train_horses, train_zebras] ]
     data_gen = [iter(dataset) for dataset in [train_horses, train_zebras]]
     
-    return data_gen, batches_per_epoch
+    return data_gen, batches_in_epoch
 
 
 
