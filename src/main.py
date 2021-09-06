@@ -37,6 +37,14 @@ def train_infogan():
     models = InfoGan()
     models.train(data_gen, batches_in_epoch, key)
 
+def train_cyclegan():
+    from data.horse2zebra import get_data
+    data_gen, batches_in_epoch = get_data()
+    key = jax.random.PRNGKey(seed=41)
+    from models.cyclegan import CycleGan
+    models = CycleGan()
+    models.train(data_gen, batches_in_epoch, key)
+
 def main():
     pass
 
