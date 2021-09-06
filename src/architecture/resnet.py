@@ -1,6 +1,6 @@
 from functools import partial
 from typing import Any, Callable, Sequence, Tuple
-
+from jax.nn.initializers import normal as normal_init
 from flax import linen as nn
 import jax.numpy as jnp
 
