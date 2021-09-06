@@ -45,24 +45,29 @@ def preprocess_image_test(image, label):
  
 
 def get_data():
-    dataset, metadata = tfds.load('cycle_gan/horse2zebra',
-                                with_info=True, as_supervised=True)
+  dataset, metadata = tfds.load('cycle_gan/horse2zebra',
+                              with_info=True, as_supervised=True)
 
-    train_horses, train_zebras = dataset['trainA'], dataset['trainB']
-    test_horses, test_zebras = dataset['testA'], dataset['testB']
+  train_horses, train_zebras = dataset['trainA'], dataset['trainB']
+  test_horses, test_zebras = dataset['testA'], dataset['testB']
 
-    train_horses = train_horses.cache().map(
-        preprocess_image_train, num_parallel_calls=AUTOTUNE).shuffle(
-        BUFFER_SIZE).batch(BATCH_SIZE)
+  train_horses = train_horses.cache().map(
+      preprocess_image_train, num_parallel_calls=AUTOTUNE).shuffle(
+      BUFFER_SIZE).batch(BATCH_SIZE)
 
-    train_zebras = train_zebras.cache().map(
-        preprocess_image_train, num_parallel_calls=AUTOTUNE).shuffle(
-        BUFFER_SIZE).batch(BATCH_SIZE)
+  train_zebras = train_zebras.cache().map(
+      preprocess_image_train, num_parallel_calls=AUTOTUNE).shuffle(
+      BUFFER_SIZE).batch(BATCH_SIZE)
 
-    batches_in_epoch = [len(dataset)//BATCH_SIZE for dataset in [train_horses, train_zebras] ]
-    data_gen = [iter(dataset) for dataset in [train_horses, train_zebras]]
-    
-    return data_gen, batches_in_epoch
+  batches_in_epoch = [len(dataset)//BATCH_SIZE for dataset in [train_horses, train_zebras] ]
+
+
+  train_horses = iter(tfds.as_numpy(train_horses))
+  train_zebras = iter(tfds.as_numpy(train_zebras))
+
+  data_gen =  [train_horses, train_zebras]
+
+  return data_gen, batches_in_epoch
 
 
 
