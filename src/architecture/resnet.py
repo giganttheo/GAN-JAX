@@ -94,6 +94,9 @@ class ResNet(nn.Module):
     return x
 
 
+ResNet18 = partial(ResNet, stage_sizes=[2, 2, 2, 2],
+            block_cls=ResNetBlock)
+  
 class Discriminator(nn.Module):
   features: int = 64
   training: bool = True
@@ -110,6 +113,3 @@ class Discriminator(nn.Module):
     x = x.reshape((x.shape[0], -1))
     return x
 
-
-ResNet18 = partial(ResNet, stage_sizes=[2, 2, 2, 2],
-            block_cls=ResNetBlock)

@@ -7,7 +7,7 @@ AUTOTUNE = tf.data.AUTOTUNE
 BUFFER_SIZE = 1000
 BATCH_SIZE = 1
 IMG_WIDTH = 256
-IMG_HEIGHT = 25
+IMG_HEIGHT = 256
 
 def random_crop(image):
   cropped_image = tf.image.random_crop(
