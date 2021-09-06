@@ -1,6 +1,14 @@
 import tensorflow as tf
 import tensorflow_datasets as tfds
 
+
+AUTOTUNE = tf.data.AUTOTUNE
+
+BUFFER_SIZE = 1000
+BATCH_SIZE = 1
+IMG_WIDTH = 256
+IMG_HEIGHT = 25
+
 def random_crop(image):
   cropped_image = tf.image.random_crop(
       image, size=[IMG_HEIGHT, IMG_WIDTH, 3])
@@ -37,13 +45,6 @@ def preprocess_image_test(image, label):
  
 
 def get_data():
-    AUTOTUNE = tf.data.AUTOTUNE
-
-    BUFFER_SIZE = 1000
-    BATCH_SIZE = 1
-    IMG_WIDTH = 256
-    IMG_HEIGHT = 25
-
     dataset, metadata = tfds.load('cycle_gan/horse2zebra',
                                 with_info=True, as_supervised=True)
 
