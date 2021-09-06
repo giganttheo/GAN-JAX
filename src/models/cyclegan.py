@@ -3,7 +3,7 @@ import jax.numpy as jnp
 import flax
 from flax import linen as nn
 from utils import sample_latent, plot
-from architecture.dcgan import Generator, Discriminator
+from architecture.resnet import Generator, Discriminator
 from models.base_model import Model
 
 #Losses
