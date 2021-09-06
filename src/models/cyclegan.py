@@ -161,7 +161,7 @@ class CycleGan(Model):
         batches_in_epoch = batches_in_epoch[0]
 
         # Retrieve shapes for generator and discriminator input.
-        image_shape = next(data_gen).shape
+        image_shape = next(data_gen_A).shape
 
         # Generate initial variables (parameters and batch statistics).
         vars_g_A = Generator().init(key_gen, jnp.ones(image_shape, jnp.float32))
