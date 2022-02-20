@@ -1,4 +1,4 @@
-# GAN-flax
+# GAN-JAX
 
 -src
 |-architecture : code for the generators and discriminators
