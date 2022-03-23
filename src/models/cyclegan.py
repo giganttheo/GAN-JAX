@@ -1,6 +1,7 @@
 import jax
 import jax.numpy as jnp
 import flax
+import optax
 from flax import linen as nn
 from utils import plot
 from architecture.unet import UNetDefault as Generator
@@ -169,10 +170,10 @@ class CycleGan_debug(Model):
         vars_d_B = Discriminator().init(key_disc, jnp.ones(image_shape, jnp.float32))
 
         # Create optimizers.
-        optim_g_A = flax.optim.Adam(0.0002, 0.5, 0.999).create(vars_g_A['params'])
-        optim_g_B = flax.optim.Adam(0.0002, 0.5, 0.999).create(vars_g_B['params'])
-        optim_d_A = flax.optim.Adam(0.0002, 0.5, 0.999).create(vars_d_A['params'])
-        optim_d_B = flax.optim.Adam(0.0002, 0.5, 0.999).create(vars_d_B['params'])
+        optim_g_A = optax.Adam(0.0002, 0.5, 0.999).create(vars_g_A['params'])
+        optim_g_B = optax.Adam(0.0002, 0.5, 0.999).create(vars_g_B['params'])
+        optim_d_A = optax.Adam(0.0002, 0.5, 0.999).create(vars_d_A['params'])
+        optim_d_B = optax.Adam(0.0002, 0.5, 0.999).create(vars_d_B['params'])
 
         loss = {'generator_A': [], 'discriminator_A': [], 'generator_B': [], 'discriminator_B': []}
 
