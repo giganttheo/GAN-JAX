@@ -170,10 +170,10 @@ class CycleGan_debug(Model):
         vars_d_B = Discriminator().init(key_disc, jnp.ones(image_shape, jnp.float32))
 
         # Create optimizers.
-        optim_g_A = optax.adam(0.0002, 0.5, 0.999).create(vars_g_A['params'])
-        optim_g_B = optax.adam(0.0002, 0.5, 0.999).create(vars_g_B['params'])
-        optim_d_A = optax.adam(0.0002, 0.5, 0.999).create(vars_d_A['params'])
-        optim_d_B = optax.adam(0.0002, 0.5, 0.999).create(vars_d_B['params'])
+        optim_g_A = flax.Adam(0.0002, 0.5, 0.999).create(vars_g_A['params'])
+        optim_g_B = flax.Adam(0.0002, 0.5, 0.999).create(vars_g_B['params'])
+        optim_d_A = flax.Adam(0.0002, 0.5, 0.999).create(vars_d_A['params'])
+        optim_d_B = flax.Adam(0.0002, 0.5, 0.999).create(vars_d_B['params'])
 
         loss = {'generator_A': [], 'discriminator_A': [], 'generator_B': [], 'discriminator_B': []}
 
