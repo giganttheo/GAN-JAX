@@ -2,12 +2,12 @@ import jax
 import jax.numpy as jnp
 import flax
 from flax import linen as nn
-from utils import sample_latent, plot
-from architecture.resnet import ResNet18 as Generator
-from architecture.resnet import Discriminator
+from utils import plot
+from architecture.unet import UNetDefault as Generator
+from architecture.unet import PatchGanDiscriminator as Discriminator
 from models.base_model import Model
 
-#Losses
+
 
 def bce_logits(input, target):
   """
@@ -31,7 +31,7 @@ def loss_generator(params_g, params_d, vars_g, vars_d, data):
       fake_data, mutable=['batch_stats']
   )
 
-  loss = bce_logits(jnp.sigmoid(fake_preds), jnp.ones((data.shape[0],), dtype=jnp.int32))
+  loss = bce_logits(jax.nn.sigmoid(fake_preds), jnp.ones((data.shape[0],), dtype=jnp.int32))
   return loss, (vars_g, vars_d)
 
 
@@ -52,8 +52,8 @@ def loss_discriminator(params_d, params_g, vars_g, vars_d, data):
       data, mutable=['batch_stats']
   )
 
-  real_loss = bce_logits(jnp.sigmoid(real_preds), jnp.ones((data.shape[0],), dtype=jnp.int32))
-  fake_loss = bce_logits(jnp.sigmoid(fake_preds), jnp.zeros((data.shape[0],), dtype=jnp.int32))
+  real_loss = bce_logits(jax.nn.sigmoid(real_preds), jnp.ones((data.shape[0],), dtype=jnp.int32))
+  fake_loss = bce_logits(jax.nn.sigmoid(fake_preds), jnp.zeros((data.shape[0],), dtype=jnp.int32))
   loss = (real_loss + fake_loss) / 2
 
   return loss, (vars_g, vars_d)
@@ -82,13 +82,13 @@ def loss_identity(params_g, vars_g, data):
 
     return identity_loss, vars_g
 
-def loss_total_gen(params_g_1, params_g_2, params_d_1, params_d_2, vars_g_1, vars_g_2, vars_d_1, vars_d_2, data_1, data_2):
+def loss_total_gen(params_g_1, params_g_2, params_d_1, params_d_2, vars_g_1, vars_g_2, vars_d_1, vars_d_2, data_1, data_2, lambda_gen = 1, lambda_cycle_1 = 1, lambda_cycle_2 = 0, lambda_id = 1):
     gen_1_loss, (vars_g_1, vars_d_1) = loss_generator(params_g_1, params_d_1, vars_g_1, vars_d_1, data_1)
     cycle_1_loss, (vars_g_1, vars_g_2) = loss_cycle(params_g_1, params_g_2, vars_g_1, vars_g_2, data_1)
     cycle_2_loss, (vars_g_2, vars_g_1) = loss_cycle(params_g_2, params_g_1, vars_g_2, vars_g_1, data_2)
     identity_1_loss, vars_g_1 = loss_identity(params_g_1, vars_g_1, data_1)
 
-    total_loss = gen_1_loss + cycle_1_loss + cycle_2_loss + identity_1_loss #TODO add lambdas
+    total_loss = lambda_gen * gen_1_loss + lambda_cycle_1 * cycle_1_loss + lambda_cycle_2 * cycle_2_loss + lambda_id * identity_1_loss #TODO add lambdas
     return total_loss, (vars_g_1, vars_g_2, vars_d_1, vars_d_2)
 
 
@@ -110,7 +110,7 @@ def train_step(data_A, data_B, vars_g_A, vars_d_A, vars_g_B, vars_d_B, optim_g_A
     optim_g_A = optim_g_A.apply_gradient(grad_g_A)
 
     #generator B
-    grad_fn_generator_B = jax.value_and_grad(loss_generator, has_aux=True)
+    grad_fn_generator_B = jax.value_and_grad(loss_total_gen, has_aux=True)
     (loss_g_B, (vars_g_B, vars_g_A, vars_d_B, vars_d_A)), grad_g_B = grad_fn_generator_B(
         optim_g_B.target, optim_g_A.target, optim_d_B.target, optim_d_A.target, vars_g_B, vars_g_A, vars_d_B, vars_d_A, data_B, data_A
     )
@@ -135,15 +135,15 @@ def train_step(data_A, data_B, vars_g_A, vars_d_A, vars_g_B, vars_d_B, optim_g_A
 
     optim_d_B = optim_d_B.apply_gradient(grad_d_B)
 
-    loss = {'generator_A': loss_g_A, 'generator_B': loss_g_B, 'discriminator_A': loss_d_A, 'dicriminator_B': loss_d_B}
-    return loss, vars_g_A, vars_d_A, vars_g_B, vars_d_B, optim_g_A, optim_d_B
+    loss = {'generator_A': loss_g_A, 'generator_B': loss_g_B, 'discriminator_A': loss_d_A, 'discriminator_B': loss_d_B}
+    return loss, vars_g_A, vars_d_A, vars_g_B, vars_d_B, optim_g_A, optim_d_A, optim_g_B, optim_d_B
 
 
 @jax.jit
 def eval_step(params, vars, data):  
-  fake_data, _ = Generator(training=False).apply(
+  fake_data, _ = Generator().apply(
       {'params': params, 'batch_stats': vars['batch_stats']},
-      data, mutable=['batch_stats']
+      data, mutable=['batch_stats'], train=False
   )
 
   return fake_data
@@ -151,19 +151,16 @@ def eval_step(params, vars, data):
 
 #Training loop 
 
-class CycleGan(Model):
-
-
+class CycleGan_debug(Model):
     def train(self, data_gen, batches_in_epoch, key, verbose=1):
-        epochs = 51
+        epochs = 10
         key, key_gen, key_disc, key_latent = jax.random.split(key, 4)
 
-        data_gen_A, data_gen_B = data_gen[0], data_gen[1]
-        batches_in_epoch = batches_in_epoch[0]
+        data_gen_A, data_gen_B = list(data_gen[0]), list(data_gen[1])
+        batches_in_epoch = min(len(data_gen_A), len(data_gen_B))
 
         # Retrieve shapes for generator and discriminator input.
-        image_shape = next(data_gen_A).shape
-
+        image_shape = data_gen_A[0].shape
         # Generate initial variables (parameters and batch statistics).
 
         vars_g_A = Generator().init(key_gen, jnp.ones(image_shape, jnp.float32))
@@ -179,12 +176,13 @@ class CycleGan(Model):
 
         loss = {'generator_A': [], 'discriminator_A': [], 'generator_B': [], 'discriminator_B': []}
 
-        for epoch in range(1, epochs):
+        for epoch in range(1, epochs + 1):
+            print(f"epoch {epoch}")
             for batch in range(batches_in_epoch):
-                data_A = next(data_gen_A)
-                data_B = next(data_gen_B)
+                data_A = data_gen_A[batch]
+                data_B = data_gen_B[batch]
 
-                batch_loss, vars_g_A, vars_d_A, vars_g_B, vars_d_B, optim_g_A, optim_d_B = train_step(
+                batch_loss, vars_g_A, vars_d_A, vars_g_B, vars_d_B, optim_g_A, optim_d_A, optim_g_B, optim_d_B = train_step(
                     data_A, data_B, vars_g_A, vars_d_A, vars_g_B, vars_d_B, optim_g_A, optim_d_A, optim_g_B, optim_d_B
                     )
 
@@ -194,4 +192,5 @@ class CycleGan(Model):
                 loss['discriminator_B'].append(batch_loss['discriminator_B'])
         
             sample = eval_step(optim_g_A.target, vars_g_A, data_A)
+            print(loss)
             plot(sample, loss, epoch)

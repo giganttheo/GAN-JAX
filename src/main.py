@@ -1,8 +1,6 @@
 import jax
 import flax
 import jax.numpy as jnp
-from models.vanilla_gan import train_step, eval_step
-from architecture.dcgan import Generator, Critic, Discriminator
 from data.mnist import get_data
 from utils import plot, plot_conditional, sample_latent
 
